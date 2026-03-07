@@ -2,9 +2,16 @@
 
 import { AuthGuard } from "@/components/AuthGuard";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { InterpretationBox } from "@/components/InterpretationBox";
 import { MetricsSummary } from "@/components/MetricsSummary";
 import { ProfitHistogram } from "@/components/ProfitHistogram";
+import { RecommendationBox } from "@/components/RecommendationBox";
+import { TornadoChart } from "@/components/TornadoChart";
+import {
+  breakEvenDemand,
+  buildRecommendationText,
+  runSensitivityAnalysis,
+  type SensitivityBar,
+} from "@/lib/analytics";
 import { db } from "@/lib/db";
 import {
   runMonteCarlo,
@@ -48,6 +55,9 @@ function scenarioToInputs(s: {
   };
 }
 
+const cardClass =
+  "rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden";
+
 export default function ScenarioDetailPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -64,6 +74,8 @@ export default function ScenarioDetailPage() {
 
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [running, setRunning] = useState(false);
+  const [sensitivityBars, setSensitivityBars] = useState<SensitivityBar[]>([]);
+  const [sensitivityLoading, setSensitivityLoading] = useState(false);
 
   type ScenarioRecord = {
     id: string;
@@ -95,11 +107,21 @@ export default function ScenarioDetailPage() {
     return first ? (first as unknown as ScenarioRecord) : null;
   }, [data]);
 
+  const inputs = useMemo(
+    () => (scenario ? scenarioToInputs(scenario) : null),
+    [scenario]
+  );
+
+  const breakEven = useMemo(
+    () => (inputs ? breakEvenDemand(inputs) : null),
+    [inputs]
+  );
+
   const handleRunSimulation = () => {
-    if (!scenario) return;
+    if (!scenario || !inputs) return;
     setRunning(true);
     setResult(null);
-    const inputs = scenarioToInputs(scenario);
+    setSensitivityBars([]);
     setTimeout(() => {
       try {
         const simResult = runMonteCarlo(inputs);
@@ -113,25 +135,46 @@ export default function ScenarioDetailPage() {
             percentile95: simResult.percentile95,
           })
         );
+        setSensitivityLoading(true);
+        setTimeout(() => {
+          try {
+            const bars = runSensitivityAnalysis(inputs);
+            setSensitivityBars(bars);
+          } finally {
+            setSensitivityLoading(false);
+          }
+        }, 0);
       } finally {
         setRunning(false);
       }
     }, 0);
   };
 
+  const recommendationLines = useMemo(() => {
+    if (!result) return [];
+    return buildRecommendationText({
+      expectedProfit: result.mean,
+      probabilityOfLoss: result.probabilityOfLoss,
+      percentile5: result.percentile5,
+      percentile95: result.percentile95,
+      breakEvenDemand: breakEven ?? null,
+      sensitivityBars,
+    });
+  }, [result, breakEven, sensitivityBars]);
+
   return (
     <AuthGuard>
       <DashboardLayout title="Scenario">
         {isLoading && (
-          <div className="text-slate-500">Loading scenario...</div>
+          <div className="text-slate-500 py-8">Loading scenario...</div>
         )}
         {error && (
-          <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-xl bg-red-50 border border-red-100 p-4 text-sm text-red-700">
             {error.message}
           </div>
         )}
         {!scenario && !isLoading && !error && (
-          <div className="rounded-lg bg-slate-100 p-4 text-slate-700">
+          <div className="rounded-xl bg-slate-100 border border-slate-200 p-6 text-slate-700">
             Scenario not found.
           </div>
         )}
@@ -140,41 +183,45 @@ export default function ScenarioDetailPage() {
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/dashboard"
-                className="text-sm text-slate-500 hover:text-slate-700"
+                className="text-sm text-slate-500 hover:text-slate-800 font-medium"
               >
                 ← Dashboard
               </Link>
             </div>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-4">
-              <h2 className="text-lg font-semibold text-slate-900">
+            {/* Scenario header */}
+            <section className={`${cardClass} p-5`}>
+              <h2 className="text-xl font-semibold text-slate-900">
                 {scenario.name}
               </h2>
               {scenario.description && (
-                <p className="mt-1 text-slate-600">{scenario.description}</p>
+                <p className="mt-1 text-slate-600 text-sm">
+                  {scenario.description}
+                </p>
               )}
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">
+            {/* Input assumptions */}
+            <section className={`${cardClass} p-5`}>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-600 mb-4">
                 Input assumptions
               </h3>
-              <dl className="grid gap-2 sm:grid-cols-2">
+              <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <dt className="text-xs text-slate-500">Fixed cost</dt>
-                  <dd className="font-medium">
+                  <dd className="font-medium text-slate-900">
                     ${Number(scenario.fixedCost).toLocaleString()}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-500">Selling price</dt>
-                  <dd className="font-medium">
+                  <dd className="font-medium text-slate-900">
                     ${Number(scenario.sellingPrice).toLocaleString()}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs text-slate-500">Demand distribution</dt>
-                  <dd className="font-medium capitalize">
+                  <dd className="font-medium text-slate-900 capitalize">
                     {scenario.demandDistributionType}
                     {scenario.demandDistributionType === "normal" &&
                       ` (μ=${scenario.demandMean}, σ=${scenario.demandStdDev})`}
@@ -184,8 +231,8 @@ export default function ScenarioDetailPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Variable cost distribution</dt>
-                  <dd className="font-medium capitalize">
+                  <dt className="text-xs text-slate-500">Variable cost</dt>
+                  <dd className="font-medium text-slate-900 capitalize">
                     {scenario.variableCostDistributionType}
                     {scenario.variableCostDistributionType === "fixed" &&
                       ` (${scenario.variableCostMode ?? scenario.variableCostMin ?? scenario.variableCostMax} per unit)`}
@@ -195,41 +242,74 @@ export default function ScenarioDetailPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">Number of simulations</dt>
-                  <dd className="font-medium">
+                  <dt className="text-xs text-slate-500">Simulations</dt>
+                  <dd className="font-medium text-slate-900">
                     {Number(scenario.numSimulations).toLocaleString()}
                   </dd>
                 </div>
+                {breakEven != null && (
+                  <div>
+                    <dt className="text-xs text-slate-500">Break-even demand</dt>
+                    <dd className="font-medium text-slate-900">
+                      {breakEven.toLocaleString()} units
+                    </dd>
+                  </div>
+                )}
               </dl>
             </section>
 
+            {/* Run simulation */}
             <section>
               <button
                 type="button"
                 onClick={handleRunSimulation}
                 disabled={running}
-                className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                className="rounded-xl bg-indigo-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 transition"
               >
-                {running ? "Running simulation…" : "Run Simulation"}
+                {running ? "Running simulation…" : "Run simulation"}
               </button>
             </section>
 
             {result && (
               <>
-                <MetricsSummary
-                  mean={result.mean}
-                  stdDev={result.stdDev}
-                  percentile5={result.percentile5}
-                  percentile95={result.percentile95}
-                  probabilityOfLoss={result.probabilityOfLoss}
-                />
-                <ProfitHistogram profits={result.profits} />
-                <InterpretationBox
-                  mean={result.mean}
-                  probabilityOfLoss={result.probabilityOfLoss}
-                  percentile5={result.percentile5}
-                  percentile95={result.percentile95}
-                />
+                {/* Summary metrics */}
+                <section>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-600 mb-4">
+                    Summary metrics
+                  </h3>
+                  <MetricsSummary
+                    mean={result.mean}
+                    stdDev={result.stdDev}
+                    percentile5={result.percentile5}
+                    percentile95={result.percentile95}
+                    probabilityOfLoss={result.probabilityOfLoss}
+                    breakEvenDemand={breakEven ?? null}
+                  />
+                </section>
+
+                {/* Profit distribution */}
+                <section className={`${cardClass} p-5`}>
+                  <ProfitHistogram profits={result.profits} />
+                </section>
+
+                {/* Sensitivity analysis */}
+                <section className={`${cardClass} p-5`}>
+                  <h3 className="text-sm font-semibold text-slate-800 mb-1">
+                    Sensitivity analysis
+                  </h3>
+                  {sensitivityLoading ? (
+                    <p className="text-sm text-slate-500 py-4">
+                      Computing sensitivity…
+                    </p>
+                  ) : (
+                    <TornadoChart bars={sensitivityBars} className="mt-2" />
+                  )}
+                </section>
+
+                {/* Recommendation */}
+                <section>
+                  <RecommendationBox lines={recommendationLines} />
+                </section>
               </>
             )}
           </div>

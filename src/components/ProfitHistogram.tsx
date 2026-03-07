@@ -26,15 +26,20 @@ export function ProfitHistogram({
 
   return (
     <div className={className}>
-      <p className="text-sm font-medium text-slate-700 mb-2">Profit distribution</p>
+      <h3 className="text-sm font-semibold text-slate-800 mb-1">
+        Profit distribution
+      </h3>
+      <p className="text-xs text-slate-500 mb-4">
+        Histogram of simulated profit outcomes across all runs
+      </p>
       <div
-        className="flex items-end gap-0.5 h-48 w-full"
-        style={{ minHeight: "12rem" }}
+        className="flex items-end gap-px h-52 w-full rounded-lg overflow-hidden bg-slate-50"
+        style={{ minHeight: "13rem" }}
       >
         {bins.map((count, i) => (
           <div
             key={i}
-            className="flex-1 bg-indigo-500 rounded-t min-w-0 transition-opacity hover:opacity-80"
+            className="flex-1 rounded-t min-w-0 transition-opacity hover:opacity-90 bg-indigo-500/90"
             style={{
               height: `${(count / maxCount) * 100}%`,
               minHeight: count > 0 ? "4px" : "0",
@@ -43,7 +48,7 @@ export function ProfitHistogram({
           />
         ))}
       </div>
-      <div className="flex justify-between mt-1 text-xs text-slate-500">
+      <div className="flex justify-between mt-2 text-xs text-slate-500">
         <span>${min.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
         <span>${max.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
       </div>

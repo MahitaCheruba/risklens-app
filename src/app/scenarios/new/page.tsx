@@ -179,18 +179,22 @@ export default function NewScenarioPage() {
     }
   };
 
+  const inputClass =
+    "mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2.5 text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500";
+  const labelClass = "block text-sm font-medium text-slate-700";
+
   return (
     <AuthGuard>
-      <DashboardLayout title="New Scenario">
+      <DashboardLayout title="New scenario">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
           {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <div className="rounded-xl bg-red-50 border border-red-100 p-4 text-sm text-red-700">
               {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <label htmlFor="name" className={labelClass}>
               Scenario name
             </label>
             <input
@@ -198,13 +202,13 @@ export default function NewScenarioPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+              className={inputClass}
               required
             />
           </div>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-slate-700">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <label htmlFor="description" className={labelClass}>
               Short description
             </label>
             <textarea
@@ -212,13 +216,13 @@ export default function NewScenarioPage() {
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+              className={inputClass}
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="fixedCost" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="fixedCost" className={labelClass}>
                 Fixed cost ($)
               </label>
               <input
@@ -228,12 +232,12 @@ export default function NewScenarioPage() {
                 step="any"
                 value={fixedCost}
                 onChange={(e) => setFixedCost(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+                className={inputClass}
                 required
               />
             </div>
             <div>
-              <label htmlFor="sellingPrice" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="sellingPrice" className={labelClass}>
                 Selling price ($)
               </label>
               <input
@@ -243,14 +247,14 @@ export default function NewScenarioPage() {
                 step="any"
                 value={sellingPrice}
                 onChange={(e) => setSellingPrice(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+                className={inputClass}
                 required
               />
             </div>
           </div>
 
-          <fieldset className="rounded-xl border border-slate-200 bg-white p-4">
-            <legend className="text-sm font-medium text-slate-900">
+          <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <legend className="text-sm font-semibold text-slate-800">
               Demand distribution
             </legend>
             <div className="mt-2 flex flex-wrap gap-4">
@@ -276,7 +280,7 @@ export default function NewScenarioPage() {
                     step="any"
                     value={demandMean}
                     onChange={(e) => setDemandMean(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
+                    className={inputClass}
                   />
                 </div>
                 <div>
@@ -287,7 +291,7 @@ export default function NewScenarioPage() {
                     step="any"
                     value={demandStdDev}
                     onChange={(e) => setDemandStdDev(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
+                    className={inputClass}
                   />
                 </div>
               </div>
@@ -296,34 +300,15 @@ export default function NewScenarioPage() {
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <div>
                   <label className="block text-sm text-slate-600">Min</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={demandMin}
-                    onChange={(e) => setDemandMin(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" step="any" value={demandMin} onChange={(e) => setDemandMin(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Mode</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={demandMode}
-                    onChange={(e) => setDemandMode(e.target.value)}
-                    placeholder="(optional)"
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" step="any" value={demandMode} onChange={(e) => setDemandMode(e.target.value)} placeholder="(optional)" className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Max</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={demandMax}
-                    onChange={(e) => setDemandMax(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" step="any" value={demandMax} onChange={(e) => setDemandMax(e.target.value)} className={inputClass} />
                 </div>
               </div>
             )}
@@ -331,30 +316,18 @@ export default function NewScenarioPage() {
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm text-slate-600">Min</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={demandMin}
-                    onChange={(e) => setDemandMin(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" step="any" value={demandMin} onChange={(e) => setDemandMin(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Max</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={demandMax}
-                    onChange={(e) => setDemandMax(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" step="any" value={demandMax} onChange={(e) => setDemandMax(e.target.value)} className={inputClass} />
                 </div>
               </div>
             )}
           </fieldset>
 
-          <fieldset className="rounded-xl border border-slate-200 bg-white p-4">
-            <legend className="text-sm font-medium text-slate-900">
+          <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <legend className="text-sm font-semibold text-slate-800">
               Variable cost distribution
             </legend>
             <div className="mt-2 flex flex-wrap gap-4">
@@ -385,7 +358,7 @@ export default function NewScenarioPage() {
                     setVariableCostMin(v);
                     setVariableCostMax(v);
                   }}
-                  className="mt-1 block w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2"
+                  className={`${inputClass} max-w-xs`}
                 />
               </div>
             )}
@@ -393,36 +366,15 @@ export default function NewScenarioPage() {
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <div>
                   <label className="block text-sm text-slate-600">Min</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={variableCostMin}
-                    onChange={(e) => setVariableCostMin(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" min={0} step="any" value={variableCostMin} onChange={(e) => setVariableCostMin(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Mode</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={variableCostMode}
-                    onChange={(e) => setVariableCostMode(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" min={0} step="any" value={variableCostMode} onChange={(e) => setVariableCostMode(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Max</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={variableCostMax}
-                    onChange={(e) => setVariableCostMax(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" min={0} step="any" value={variableCostMax} onChange={(e) => setVariableCostMax(e.target.value)} className={inputClass} />
                 </div>
               </div>
             )}
@@ -430,32 +382,18 @@ export default function NewScenarioPage() {
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm text-slate-600">Min</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={variableCostMin}
-                    onChange={(e) => setVariableCostMin(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" min={0} step="any" value={variableCostMin} onChange={(e) => setVariableCostMin(e.target.value)} className={inputClass} />
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600">Max</label>
-                  <input
-                    type="number"
-                    min={0}
-                    step="any"
-                    value={variableCostMax}
-                    onChange={(e) => setVariableCostMax(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2"
-                  />
+                  <input type="number" min={0} step="any" value={variableCostMax} onChange={(e) => setVariableCostMax(e.target.value)} className={inputClass} />
                 </div>
               </div>
             )}
           </fieldset>
 
-          <div className="max-w-xs">
-            <label htmlFor="numSimulations" className="block text-sm font-medium text-slate-700">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm max-w-xs">
+            <label htmlFor="numSimulations" className={labelClass}>
               Number of simulations
             </label>
             <input
@@ -465,7 +403,7 @@ export default function NewScenarioPage() {
               max={1_000_000}
               value={numSimulations}
               onChange={(e) => setNumSimulations(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+              className={inputClass}
             />
           </div>
 
@@ -473,13 +411,13 @@ export default function NewScenarioPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 transition"
             >
               {saving ? "Saving…" : "Save scenario"}
             </button>
             <Link
               href="/dashboard"
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition"
             >
               Cancel
             </Link>

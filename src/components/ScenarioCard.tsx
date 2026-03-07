@@ -49,22 +49,24 @@ export function ScenarioCard({
   return (
     <Link
       href={`/scenarios/${id}`}
-      className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
+      className="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md"
     >
       <div className="flex flex-col gap-2">
         <h3 className="font-semibold text-slate-900">{name}</h3>
         {description && (
           <p className="text-sm text-slate-600 line-clamp-2">{description}</p>
         )}
-        <p className="text-xs text-slate-400">Updated {formatDate(updatedAt)}</p>
+        <p className="text-xs text-slate-400">
+          Updated {formatDate(updatedAt)}
+        </p>
         {hasMetrics && (
-          <div className="mt-2 flex flex-wrap gap-3 text-sm">
+          <div className="mt-3 flex flex-wrap gap-4 text-sm">
             {expectedProfit != null && (
               <span className="text-slate-700">
-                Expected profit:{" "}
+                Expected:{" "}
                 <span
                   className={
-                    expectedProfit >= 0 ? "text-green-600" : "text-red-600"
+                    expectedProfit >= 0 ? "text-emerald-600 font-medium" : "text-rose-600 font-medium"
                   }
                 >
                   {formatCurrency(expectedProfit)}
@@ -78,8 +80,7 @@ export function ScenarioCard({
             )}
             {percentile5 != null && percentile95 != null && (
               <span className="text-slate-700">
-                5th–95th: {formatCurrency(percentile5)} –{" "}
-                {formatCurrency(percentile95)}
+                5th–95th: {formatCurrency(percentile5)} – {formatCurrency(percentile95)}
               </span>
             )}
           </div>

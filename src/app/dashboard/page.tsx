@@ -27,14 +27,8 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/test-idea"
-              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition"
-            >
-              Test your business idea
-            </Link>
-            <Link
               href="/scenarios/new"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition"
+              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition"
             >
               Create new scenario
             </Link>
